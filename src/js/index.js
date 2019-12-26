@@ -14,12 +14,19 @@ async function main() {
 
   const grains = [];
 
-  const play = (grainParams) => {
-    grainService.playGrain(context, buffer, grainParams);
-    if (grains.length === 1) {
+  const clearGrains = () => {
+    if (grains.length) {
       clearTimeout(grains[0].timeout);
       grains.shift();
     }
+  };
+
+  const play = (grainParams) => {
+    clearGrains();
+    if (context.state === 'suspended') {
+      context.resume();
+    }
+    grainService.playGrain(context, buffer, grainParams);
     const timeout = setTimeout(() => play(grainParams), grainParams.interval);
     grains.push({ grain: grainParams, timeout });
   };
@@ -37,6 +44,11 @@ async function main() {
     }
     play(grainParams);
   });
+
+  elements.stop.onclick = () => {
+    context.suspend();
+    clearGrains();
+  };
 }
 
 window.onload = main;

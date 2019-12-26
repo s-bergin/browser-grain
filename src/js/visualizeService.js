@@ -8,6 +8,7 @@ const SPREAD_ID = 'spread';
 const INTERVAL_ID = 'interval';
 const WAVEFORM_CANVAS_ID = 'waveform';
 const PARAM_INPUTS_ID = 'paramInputs';
+const STOP_ID = 'stop';
 
 const draw = function draw(canvas) {
   const context = canvas.getContext('2d');
@@ -68,6 +69,7 @@ const getElements = function getElements() {
   const playbackRate = document.getElementById(PLAYBACK_RATE_ID);
   const spread = document.getElementById(SPREAD_ID);
   const interval = document.getElementById(INTERVAL_ID);
+  const stop = document.getElementById(STOP_ID);
   return {
     canvas,
     attack,
@@ -76,6 +78,7 @@ const getElements = function getElements() {
     playbackRate,
     spread,
     interval,
+    stop,
   };
 };
 
