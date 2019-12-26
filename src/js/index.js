@@ -4,6 +4,7 @@ import visualizeService from './visualizeService';
 
 const AUDIO_FILE = 'http://localhost:3000/audio/example1.mp3';
 const WAVEFORM_CANVAS_ID = 'waveform';
+const PARAM_INPUTS_ID = 'paramInputs';
 
 async function main() {
   const context = new AudioContext();
@@ -15,19 +16,27 @@ async function main() {
 
   const grains = [];
 
-  canvas.addEventListener('mousedown', (event) => {
-    const grainParams = visualizeService.getGrainParams(buffer, canvas, event);
+  const play = (grainParams) => {
+    grainService.playGrain(context, buffer, grainParams);
+    if (grains.length === 1) {
+      clearTimeout(grains[0].timeout);
+      grains.shift();
+    }
+    const timeout = setTimeout(() => play(grainParams), grainParams.interval);
+    grains.push({ grain: grainParams, timeout });
+  };
 
-    const play = () => {
-      grainService.playGrain(context, buffer, grainParams);
-      if (grains.length === 1) {
-        clearTimeout(grains[0].timeout);
-        grains.shift();
-      }
-      const timeout = setTimeout(play, grainParams.interval);
-      grains.push({ grain: grainParams, timeout });
-    };
-    play();
+  canvas.addEventListener('mousedown', (event) => {
+    play(visualizeService.getGrainParams(buffer, canvas, event));
+  });
+
+  const paramInputs = document.getElementById(PARAM_INPUTS_ID);
+  paramInputs.addEventListener('change', () => {
+    const grainParams = visualizeService.getGrainParams(buffer, canvas);
+    if (grains.length) {
+      grainParams.offset = grains[grains.length - 1].grain.offset;
+    }
+    play(grainParams);
   });
 }
 
