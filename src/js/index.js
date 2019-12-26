@@ -1,4 +1,5 @@
 import bufferService from './bufferService';
+import grainService from './grainService';
 import visualizeService from './visualizeService';
 
 const AUDIO_FILE = 'http://localhost:3000/audio/example1.mp3';
@@ -11,14 +12,22 @@ async function main() {
 
   const canvas = document.getElementById(WAVEFORM_CANVAS_ID);
   visualizeService.draw(canvas);
-  canvas.addEventListener('mousedown', (event) => {
-    const source = context.createBufferSource();
-    source.buffer = buffer;
-    source.connect(context.destination);
 
-    const rect = canvas.getBoundingClientRect();
-    const position = visualizeService.getGrainPosition(rect, event.clientX, buffer.duration);
-    source.start(context.currentTime, position, 1);
+  const grains = [];
+
+  canvas.addEventListener('mousedown', (event) => {
+    const grainParams = visualizeService.getGrainParams(buffer, canvas, event);
+
+    const play = () => {
+      grainService.playGrain(context, buffer, grainParams);
+      if (grains.length === 1) {
+        clearTimeout(grains[0].timeout);
+        grains.shift();
+      }
+      const timeout = setTimeout(play, grainParams.interval);
+      grains.push({ grain: grainParams, timeout });
+    };
+    play();
   });
 }
 
