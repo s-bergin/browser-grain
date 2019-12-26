@@ -3,16 +3,14 @@ import grainService from './grainService';
 import visualizeService from './visualizeService';
 
 const AUDIO_FILE = 'http://localhost:3000/audio/example1.mp3';
-const WAVEFORM_CANVAS_ID = 'waveform';
-const PARAM_INPUTS_ID = 'paramInputs';
 
 async function main() {
   const context = new AudioContext();
   const arrayBuffer = await bufferService.getFileAsArrayBuffer(AUDIO_FILE);
   const buffer = await context.decodeAudioData(arrayBuffer);
 
-  const canvas = document.getElementById(WAVEFORM_CANVAS_ID);
-  visualizeService.draw(canvas);
+  const elements = visualizeService.getElements();
+  visualizeService.draw(elements.canvas);
 
   const grains = [];
 
@@ -26,13 +24,14 @@ async function main() {
     grains.push({ grain: grainParams, timeout });
   };
 
-  canvas.addEventListener('mousedown', (event) => {
-    play(visualizeService.getGrainParams(buffer, canvas, event));
+  elements.canvas.addEventListener('mousedown', (event) => {
+    const clientPosition = { x: event.clientX, y: event.clientY };
+    play(visualizeService.getGrainParams(buffer, elements, { clientPosition }));
   });
 
-  const paramInputs = document.getElementById(PARAM_INPUTS_ID);
+  const paramInputs = visualizeService.getParamInputs();
   paramInputs.addEventListener('change', () => {
-    const grainParams = visualizeService.getGrainParams(buffer, canvas);
+    const grainParams = visualizeService.getGrainParams(buffer, elements);
     if (grains.length) {
       grainParams.offset = grains[grains.length - 1].grain.offset;
     }

@@ -6,6 +6,8 @@ const DURATION_ID = 'duration';
 const PLAYBACK_RATE_ID = 'playbackRate';
 const SPREAD_ID = 'spread';
 const INTERVAL_ID = 'interval';
+const WAVEFORM_CANVAS_ID = 'waveform';
+const PARAM_INPUTS_ID = 'paramInputs';
 
 const draw = function draw(canvas) {
   const context = canvas.getContext('2d');
@@ -26,43 +28,64 @@ const draw = function draw(canvas) {
 };
 
 /**
- * @param {DOMRect} domRect
+ * @param {Canvas} domRect
  * @param {Number} clientPosition
  * @param {Number} bufferDuration
  * @returns {Number}
  */
-const getOffset = function getOffset(domRect, clientPosition, bufferDuration) {
-  const x = clientPosition - domRect.left;
-  return x * (bufferDuration / domRect.width);
-};
-
-/**
- * @param {String} elementId
- * @return {Number}
- */
-const getElementValueAsFloat = function getElementValueAsFloat(elementId) {
-  return parseFloat(document.getElementById(elementId).value);
+const getOffset = function getOffset(canvas, clientPosition, bufferDuration) {
+  const domRect = canvas.getBoundingClientRect();
+  if (clientPosition) {
+    const x = clientPosition.x - domRect.left;
+    return x * (bufferDuration / domRect.width);
+  }
+  return 0;
 };
 
 /**
  * @param {AudioBuffer} buffer
- * @param {Canvas} canvas
- * @param {Event} event
+ * @param {Object} elements
+ * @param {Options} options
  * @returns {Object}
  */
-const getGrainParams = function getGrainParams(buffer, canvas, event) {
+const getGrainParams = function getGrainParams(buffer, elements, options = {}) {
   return {
-    attack: getElementValueAsFloat(ATTACK_ID),
-    release: getElementValueAsFloat(RELEASE_ID),
-    duration: getElementValueAsFloat(DURATION_ID),
-    playbackRate: getElementValueAsFloat(PLAYBACK_RATE_ID),
-    spread: getElementValueAsFloat(SPREAD_ID),
-    interval: getElementValueAsFloat(INTERVAL_ID),
-    offset: event ? getOffset(canvas.getBoundingClientRect(), event.clientX, buffer.duration) : 0,
+    attack: Number.parseFloat(elements.attack.value),
+    release: Number.parseFloat(elements.release.value),
+    duration: Number.parseFloat(elements.duration.value),
+    playbackRate: Number.parseFloat(elements.playbackRate.value),
+    spread: Number.parseFloat(elements.spread.value),
+    interval: Number.parseFloat(elements.interval.value),
+    offset: getOffset(elements.canvas, options.clientPosition, buffer.duration),
   };
+};
+
+const getElements = function getElements() {
+  const canvas = document.getElementById(WAVEFORM_CANVAS_ID);
+  const attack = document.getElementById(ATTACK_ID);
+  const release = document.getElementById(RELEASE_ID);
+  const duration = document.getElementById(DURATION_ID);
+  const playbackRate = document.getElementById(PLAYBACK_RATE_ID);
+  const spread = document.getElementById(SPREAD_ID);
+  const interval = document.getElementById(INTERVAL_ID);
+  return {
+    canvas,
+    attack,
+    release,
+    duration,
+    playbackRate,
+    spread,
+    interval,
+  };
+};
+
+const getParamInputs = function getParamInputs() {
+  return document.getElementById(PARAM_INPUTS_ID);
 };
 
 export default {
   draw,
   getGrainParams,
+  getElements,
+  getParamInputs,
 };
