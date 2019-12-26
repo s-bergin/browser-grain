@@ -1,5 +1,11 @@
 const WIDTH = 1000;
 const HEIGHT = 250;
+const ATTACK_ID = 'attack';
+const RELEASE_ID = 'release';
+const DURATION_ID = 'duration';
+const PLAYBACK_RATE_ID = 'playbackRate';
+const SPREAD_ID = 'spread';
+const INTERVAL_ID = 'interval';
 
 const draw = function draw(canvas) {
   const context = canvas.getContext('2d');
@@ -25,9 +31,17 @@ const draw = function draw(canvas) {
  * @param {Number} bufferDuration
  * @returns {Number}
  */
-const getGrainOffset = function getGrainOffset(domRect, clientPosition, bufferDuration) {
+const getOffset = function getOffset(domRect, clientPosition, bufferDuration) {
   const x = clientPosition - domRect.left;
   return x * (bufferDuration / domRect.width);
+};
+
+/**
+ * @param {String} elementId
+ * @return {Number}
+ */
+const getElementValueAsFloat = function getElementValueAsFloat(elementId) {
+  return parseFloat(document.getElementById(elementId).value);
 };
 
 /**
@@ -37,15 +51,14 @@ const getGrainOffset = function getGrainOffset(domRect, clientPosition, bufferDu
  * @returns {Object}
  */
 const getGrainParams = function getGrainParams(buffer, canvas, event) {
-  const offset = getGrainOffset(canvas.getBoundingClientRect(), event.clientX, buffer.duration);
   return {
-    attack: 0.5,
-    release: 0.5,
-    duration: 1,
-    playbackRate: 0.8,
-    spread: 10,
-    interval: 100,
-    offset,
+    attack: getElementValueAsFloat(ATTACK_ID),
+    release: getElementValueAsFloat(RELEASE_ID),
+    duration: getElementValueAsFloat(DURATION_ID),
+    playbackRate: getElementValueAsFloat(PLAYBACK_RATE_ID),
+    spread: getElementValueAsFloat(SPREAD_ID),
+    interval: getElementValueAsFloat(INTERVAL_ID),
+    offset: event ? getOffset(canvas.getBoundingClientRect(), event.clientX, buffer.duration) : 0,
   };
 };
 
