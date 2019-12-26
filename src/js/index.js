@@ -22,13 +22,17 @@ async function main() {
   };
 
   const play = (grainParams) => {
-    clearGrains();
+    const loop = () => {
+      clearGrains();
+      grainService.playGrain(context, buffer, grainParams);
+      const timeout = setTimeout(() => loop(grainParams), grainParams.interval);
+      grains.push({ grain: grainParams, timeout });
+    };
     if (context.state === 'suspended') {
       context.resume();
     }
-    grainService.playGrain(context, buffer, grainParams);
-    const timeout = setTimeout(() => play(grainParams), grainParams.interval);
-    grains.push({ grain: grainParams, timeout });
+    loop();
+    grainService.createGrainDelay(context, buffer, grainParams);
   };
 
   elements.canvas.addEventListener('mousedown', (event) => {

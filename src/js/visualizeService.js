@@ -9,6 +9,8 @@ const INTERVAL_ID = 'interval';
 const WAVEFORM_CANVAS_ID = 'waveform';
 const PARAM_INPUTS_ID = 'paramInputs';
 const STOP_ID = 'stop';
+const DELAY_TIME_ID = 'delayTime';
+const DELAY_FEEDBACK_ID = 'delayFeedback';
 
 const draw = function draw(canvas) {
   const context = canvas.getContext('2d');
@@ -58,6 +60,10 @@ const getGrainParams = function getGrainParams(buffer, elements, options = {}) {
     spread: Number.parseFloat(elements.spread.value),
     interval: Number.parseFloat(elements.interval.value),
     offset: getOffset(elements.canvas, options.clientPosition, buffer.duration),
+    delay: {
+      time: Number.parseFloat(elements.delay.time.value),
+      feedback: Number.parseFloat(elements.delay.feedback.value),
+    },
   };
 };
 
@@ -70,6 +76,8 @@ const getElements = function getElements() {
   const spread = document.getElementById(SPREAD_ID);
   const interval = document.getElementById(INTERVAL_ID);
   const stop = document.getElementById(STOP_ID);
+  const delayTime = document.getElementById(DELAY_TIME_ID);
+  const delayFeedback = document.getElementById(DELAY_FEEDBACK_ID);
   return {
     canvas,
     attack,
@@ -79,6 +87,10 @@ const getElements = function getElements() {
     spread,
     interval,
     stop,
+    delay: {
+      time: delayTime,
+      feedback: delayFeedback,
+    },
   };
 };
 
