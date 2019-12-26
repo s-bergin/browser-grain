@@ -1,8 +1,8 @@
 /**
  * @param {String} file
- * @returns {Array<Buffer>}
+ * @returns {ArrayBuffer}
  */
-const getFileAsBuffer = async function getFileAsBuffer(file) {
+const getFileAsArrayBuffer = async function getFileAsArrayBuffer(file) {
   const response = await fetch(file);
   if (!response.ok) {
     throw new Error(`Failed to fetch file ${file}`);
@@ -11,5 +11,5 @@ const getFileAsBuffer = async function getFileAsBuffer(file) {
 };
 
 export default {
-  getFileAsBuffer,
+  getFileAsArrayBuffer,
 };
