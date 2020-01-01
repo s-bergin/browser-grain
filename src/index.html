@@ -1,38 +1,26 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <link rel="stylesheet" type="text/css" href="./styles.css">
     <script src='../dist/main.js'></script>
   </head>
   <body>
     <header>Browser Grain</header>
-    <canvas id='waveform' width='1000px;' height='250px;'></canvas>
-    <div id='paramInputs'>
-      <label for='attack'>Attack</label>
-      <input type='number' id='attack' value='2' min='0' max='5' step='0.01'/>
-
-      <label for='release'>Release</label>
-      <input type='number' id='release' value='0.5' min='0' max='5' step='0.01'/>
-
-      <label for='duration'>Grain Duration</label>
-      <input type='number' id='duration' value='2' min='0' max='5' step='0.01'/>
-
-      <label for='playbackRate'>Playback Rate</label>
-      <input type='number' id='playbackRate' value='4' min='0' max='10' step='0.01'/>
-
-      <label for='spread'>Spread</label>
-      <input type='number' id='spread' value='0' min='0' max='1000'/>
-
-      <label for='interval'>Interval</label>
-      <input type='number' id='interval' value='500' min='0' max='1000'/>
-
-      <label for='delayTime'>Delay Time</label>
-      <input type='number' id='delayTime' value='0.0' min='0' max='1' step='0.01'/>
-
-      <label for='delayFeedback'>Delay Feedback</label>
-      <input type='number' id='delayFeedback' value='0.0' min='0' max='1' step='0.01'/>
-    </div>
-    <div>
-      <button id='stop'>Stop</button>
+    <div class='container'>
+      <canvas id='waveform' width='1000px;' height='250px;'></canvas>
+      <div id='paramInputs' class='d-flex d-space-between'>
+        <input type='range' orient='vertical' id='attack' value='2' min='0' max='5' step='0.01'/>
+        <input type='range' orient='vertical' id='release' value='0.5' min='0' max='5' step='0.01'/>
+        <input type='range' orient='vertical' id='duration' value='2' min='0' max='5' step='0.01'/>
+        <input type='range' orient='vertical' id='playbackRate' value='4' min='0' max='10' step='0.01'/>
+        <input type='range' orient='vertical' id='spread' value='0' min='0' max='1000'/>
+        <input type='range' orient='vertical' id='interval' value='500' min='0' max='1000'/>
+        <input type='range' orient='vertical' id='delayTime' value='0.0' min='0' max='1' step='0.01'/>
+        <input type='range' orient='vertical' id='delayFeedback' value='0.0' min='0' max='1' step='0.01'/>
+      </div>
+      <div class='d-flex d-flex-end d-margin-top'>
+        <button id='stop' class='button'></button>
+      </div>
     </div>
   </body>
 </html>

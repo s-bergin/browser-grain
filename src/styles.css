@@ -1,0 +1,28 @@
+.container {
+  width: 1000px;
+  background-color:#000;
+}
+
+.button {
+  border: 1px outset #ffffff;
+  background-color: #ffffff;
+  height: 30px;
+  width: 30px;
+  cursor: pointer;
+}
+
+.d-flex {
+  display: flex;
+}
+
+.d-flex-end {
+  justify-content: flex-end;
+}
+
+.d-space-between {
+  justify-content: space-between;
+}
+
+.d-margin-top {
+  margin-top: 0.5rem;
+}
