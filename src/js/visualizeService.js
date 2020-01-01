@@ -12,22 +12,22 @@ const STOP_ID = 'stop';
 const DELAY_TIME_ID = 'delayTime';
 const DELAY_FEEDBACK_ID = 'delayFeedback';
 
-const draw = function draw(canvas) {
+const drawWaveform = function drawWaveform(canvas, audioData) {
   const context = canvas.getContext('2d');
-
-  context.fillStyle = 'rgb(200, 200, 200)';
   context.fillRect(0, 0, WIDTH, HEIGHT);
-  context.lineWidth = 2;
-  context.strokeStyle = 'rgb(0, 0, 0)';
-  context.beginPath();
+  context.strokeStyle = '#FFFFFF';
+  context.translate(0, HEIGHT / 2);
+  audioData.forEach((data, index) => {
+    const x = Math.floor((WIDTH * index) / audioData.length);
+    const y = (data * HEIGHT) / 2;
+    context.moveTo(x, 0);
+    context.lineTo(x + 1, y);
+    context.stroke();
+  });
+};
 
-  context.moveTo(0, HEIGHT / 2);
-  context.lineTo(WIDTH, HEIGHT / 2);
-
-  context.strokeStyle = 'red';
-  context.stroke();
-
-  return canvas;
+const draw = function draw(canvas, audioData) {
+  drawWaveform(canvas, audioData);
 };
 
 /**

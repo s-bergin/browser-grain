@@ -10,7 +10,10 @@ async function main() {
   const buffer = await context.decodeAudioData(arrayBuffer);
 
   const elements = visualizeService.getElements();
-  visualizeService.draw(elements.canvas);
+  visualizeService.draw(
+    elements.canvas,
+    bufferService.reduceSamples(buffer.getChannelData(0)),
+  );
 
   const grains = [];
 
