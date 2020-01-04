@@ -15,21 +15,20 @@ async function main() {
     bufferService.reduceSamples(buffer.getChannelData(0)),
   );
 
-  const grains = [];
+  let latestGrain;
 
-  const clearGrains = () => {
-    if (grains.length) {
-      clearTimeout(grains[0].timeout);
-      grains.shift();
+  const clearLatestGrain = () => {
+    if (latestGrain) {
+      clearTimeout(latestGrain.timeout);
     }
   };
 
   const play = (grainParams) => {
     const loop = () => {
-      clearGrains();
+      clearLatestGrain();
       grainService.playGrain(context, buffer, grainParams);
       const timeout = setTimeout(() => loop(grainParams), grainParams.interval);
-      grains.push({ grain: grainParams, timeout });
+      latestGrain = { grain: grainParams, timeout };
     };
     if (context.state === 'suspended') {
       context.resume();
@@ -46,15 +45,15 @@ async function main() {
   const paramInputs = visualizeService.getParamInputs();
   paramInputs.addEventListener('change', () => {
     const grainParams = visualizeService.getGrainParams(buffer, elements);
-    if (grains.length) {
-      grainParams.offset = grains[grains.length - 1].grain.offset;
+    if (latestGrain) {
+      grainParams.offset = latestGrain.grain.offset;
     }
     play(grainParams);
   });
 
   elements.stop.onclick = () => {
     context.suspend();
-    clearGrains();
+    clearLatestGrain();
   };
 }
 
