@@ -1,5 +1,3 @@
-const WIDTH = 1000;
-const HEIGHT = 250;
 const ATTACK_ID = 'attack';
 const RELEASE_ID = 'release';
 const DURATION_ID = 'duration';
@@ -11,36 +9,45 @@ const PARAM_INPUTS_ID = 'paramInputs';
 const STOP_ID = 'stop';
 const DELAY_TIME_ID = 'delayTime';
 const DELAY_FEEDBACK_ID = 'delayFeedback';
+const AUDIO_ID = 'audio';
 
 const drawWaveform = function drawWaveform(canvas, audioData) {
   const context = canvas.getContext('2d');
-  context.fillRect(0, 0, WIDTH, HEIGHT);
+  context.fillRect(0, 0, canvas.width, canvas.height);
   context.strokeStyle = '#FFFFFF';
-  context.translate(0, HEIGHT / 2);
+  context.translate(0, canvas.height / 2);
   audioData.forEach((data, index) => {
-    const x = Math.floor((WIDTH * index) / audioData.length);
-    const y = (data * HEIGHT) / 2;
+    const x = Math.floor((canvas.width * index) / audioData.length);
+    const y = (data * canvas.height) / 2;
     context.moveTo(x, 0);
     context.lineTo(x + 1, y);
-    context.stroke();
   });
+  context.stroke();
+};
+
+const clearCanvas = function clearCanvas(canvas) {
+  const context = canvas.getContext('2d');
+  context.clearRect(0, 0, canvas.width, canvas.height);
+  context.setTransform(1, 0, 0, 1, 0, 0);
+  context.beginPath();
 };
 
 const draw = function draw(canvas, audioData) {
+  clearCanvas(canvas);
   drawWaveform(canvas, audioData);
 };
 
 /**
  * @param {Canvas} domRect
  * @param {Number} clientPosition
- * @param {Number} bufferDuration
+ * @param {AudioBuffer} buffer
  * @returns {Number}
  */
-const getOffset = function getOffset(canvas, clientPosition, bufferDuration) {
-  const domRect = canvas.getBoundingClientRect();
-  if (clientPosition) {
+const getOffset = function getOffset(canvas, clientPosition, buffer) {
+  if (clientPosition && buffer) {
+    const domRect = canvas.getBoundingClientRect();
     const x = clientPosition.x - domRect.left;
-    return x * (bufferDuration / domRect.width);
+    return x * (buffer.duration / domRect.width);
   }
   return 0;
 };
@@ -59,7 +66,7 @@ const getGrainParams = function getGrainParams(buffer, elements, options = {}) {
     playbackRate: Number.parseFloat(elements.playbackRate.value),
     spread: Number.parseFloat(elements.spread.value),
     interval: Number.parseFloat(elements.interval.value),
-    offset: getOffset(elements.canvas, options.clientPosition, buffer.duration),
+    offset: getOffset(elements.canvas, options.clientPosition, buffer),
     delay: {
       time: Number.parseFloat(elements.delay.time.value),
       feedback: Number.parseFloat(elements.delay.feedback.value),
@@ -78,6 +85,7 @@ const getElements = function getElements() {
   const stop = document.getElementById(STOP_ID);
   const delayTime = document.getElementById(DELAY_TIME_ID);
   const delayFeedback = document.getElementById(DELAY_FEEDBACK_ID);
+  const audio = document.getElementById(AUDIO_ID);
   return {
     canvas,
     attack,
@@ -87,6 +95,7 @@ const getElements = function getElements() {
     spread,
     interval,
     stop,
+    audio,
     delay: {
       time: delayTime,
       feedback: delayFeedback,
