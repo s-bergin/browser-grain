@@ -2,19 +2,10 @@ import bufferService from './bufferService';
 import grainService from './grainService';
 import visualizeService from './visualizeService';
 
-const AUDIO_FILE = 'http://localhost:3000/audio/example1.mp3';
-
 async function main() {
   const context = new AudioContext();
-  const arrayBuffer = await bufferService.getFileAsArrayBuffer(AUDIO_FILE);
-  const buffer = await context.decodeAudioData(arrayBuffer);
-
   const elements = visualizeService.getElements();
-  visualizeService.draw(
-    elements.canvas,
-    bufferService.reduceSamples(buffer.getChannelData(0)),
-  );
-
+  let buffer;
   let latestGrain;
 
   const clearLatestGrain = () => {
@@ -23,19 +14,37 @@ async function main() {
     }
   };
 
-  const play = (grainParams) => {
-    const loop = () => {
-      clearLatestGrain();
-      grainService.playGrain(context, buffer, grainParams);
-      const timeout = setTimeout(() => loop(grainParams), grainParams.interval);
-      latestGrain = { grain: grainParams, timeout };
-    };
-    if (context.state === 'suspended') {
-      context.resume();
-    }
-    loop();
-    grainService.createGrainDelay(context, buffer, grainParams);
+  const stop = () => {
+    context.suspend();
+    clearLatestGrain();
   };
+
+  const play = (grainParams) => {
+    if (buffer) {
+      const loop = () => {
+        clearLatestGrain();
+        grainService.playGrain(context, buffer, grainParams);
+        const timeout = setTimeout(() => loop(grainParams), grainParams.interval);
+        latestGrain = { grain: grainParams, timeout };
+      };
+      if (context.state === 'suspended') {
+        context.resume();
+      }
+      loop();
+      grainService.createGrainDelay(context, buffer, grainParams);
+    }
+  };
+
+  elements.audio.addEventListener('change', async () => {
+    stop();
+    const [file] = elements.audio.files;
+    const arrayBuffer = await file.arrayBuffer();
+    buffer = await context.decodeAudioData(arrayBuffer);
+    visualizeService.draw(
+      elements.canvas,
+      bufferService.reduceSamples(buffer.getChannelData(0)),
+    );
+  });
 
   elements.canvas.addEventListener('mousedown', (event) => {
     const clientPosition = { x: event.clientX, y: event.clientY };
@@ -52,8 +61,7 @@ async function main() {
   });
 
   elements.stop.onclick = () => {
-    context.suspend();
-    clearLatestGrain();
+    stop();
   };
 }
 
